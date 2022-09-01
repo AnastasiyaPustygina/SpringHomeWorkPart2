@@ -6,9 +6,14 @@ import java.util.List;
 
 public interface GenreDao {
 
-    Genre findById(long id);
+    Genre findByName(String name);
+
     List<Genre> findAll();
-    long insert(Genre genre);
-    void deleteById(long id);
+
+    Genre insert(Genre genre);
+
+    void deleteByName(String name);
+
+    void setGenres(List<Genre> genres);
 
 }

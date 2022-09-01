@@ -5,7 +5,6 @@ import lombok.Value;
 
 @Value
 @Builder
-
 public class Author {
     long id;
     String name;

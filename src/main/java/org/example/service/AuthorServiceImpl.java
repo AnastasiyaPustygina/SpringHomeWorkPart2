@@ -3,17 +3,19 @@ package org.example.service;
 import lombok.RequiredArgsConstructor;
 import org.example.dao.AuthorDao;
 import org.example.domain.Author;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 @RequiredArgsConstructor
 public class AuthorServiceImpl implements AuthorService{
 
     private final AuthorDao dao;
 
     @Override
-    public Author findById(long id) {
-        return dao.findById(id);
+    public Author findByName(String name) {
+        return dao.findByName(name);
     }
 
     @Override
@@ -22,12 +24,12 @@ public class AuthorServiceImpl implements AuthorService{
     }
 
     @Override
-    public long insert(Author author) {
+    public Author insert(Author author) {
         return dao.insert(author);
     }
 
     @Override
-    public void deleteById(long id) {
-        dao.deleteById(id);
+    public void deleteByName(String name) {
+        dao.deleteByName(name);
     }
 }

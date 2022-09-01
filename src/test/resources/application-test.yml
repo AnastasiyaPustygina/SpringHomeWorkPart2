@@ -1,11 +1,14 @@
 server:
   port: 8082
 spring:
+  shell:
+    interactive:
+      enabled: false
   datasource:
     initialization-mode: ALWAYS
-    schema: database/initDB.sql
-    data: database/populateDB.sql
-    url: jdbc:postgresql://localhost:5432/library
+    schema: database/test-initDB.sql
+    data: database/test-populateDB.sql
+    url: jdbc:postgresql://localhost:5432/libraryTest
     username: postgres
     password: 1240562Na
     driver-class-name: org.postgresql.Driver

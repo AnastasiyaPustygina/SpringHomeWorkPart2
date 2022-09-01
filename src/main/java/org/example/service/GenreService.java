@@ -1,15 +1,17 @@
 package org.example.service;
 
-import org.example.domain.Book;
 import org.example.domain.Genre;
 
 import java.util.List;
 
 public interface GenreService {
 
-    Genre findById(long id);
+    Genre findByName(String name);
+
     List<Genre> findAll();
-    long insert(Genre genre);
-    void deleteById(long id);
+
+    Genre insert(Genre genre);
+
+    void deleteByName(String name);
 
 }

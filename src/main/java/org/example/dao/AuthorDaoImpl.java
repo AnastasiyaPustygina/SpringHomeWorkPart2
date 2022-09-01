@@ -1,7 +1,7 @@
 package org.example.dao;
 
 import org.example.domain.Author;
-import org.example.domain.Book;
+import org.example.exception.AuthorAlreadyExistsException;
 import org.example.exception.AuthorNotFoundException;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,18 +13,14 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Repository
 public class AuthorDaoImpl implements AuthorDao{
 
     private final NamedParameterJdbcOperations jdbc;
     private final BookDao bookDao;
-    private final List<Author> authors;
+    private List<Author> authors;
 
     public AuthorDaoImpl(NamedParameterJdbcOperations jdbc, @Lazy BookDao bookDao) {
         this.bookDao = bookDao;
@@ -33,9 +29,9 @@ public class AuthorDaoImpl implements AuthorDao{
     }
 
     @Override
-    public Author findById(long id) throws AuthorNotFoundException{
-        return authors.stream().filter(a -> a.getId() == id).findAny().orElseThrow(
-                () -> new AuthorNotFoundException("Author with id " + id  + " was not found"));
+    public Author findByName(String name){
+        return authors.stream().filter(a -> a.getName().equals(name)).findAny().orElseThrow(
+                () -> new AuthorNotFoundException("author with name " + name + " was not found"));
     }
 
     @Override
@@ -44,31 +40,42 @@ public class AuthorDaoImpl implements AuthorDao{
     }
 
     @Override
-    public long insert(Author author) {
+    public Author insert(Author author) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("author_name", author.getName());
+        if(authors.stream().anyMatch(a -> a.getName().equals(author.getName())))
+            throw new AuthorAlreadyExistsException("author with name " + author.getName() + " already exists");
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update("insert into authors (author_name) values(:author_name)", params, keyHolder,
                 new String[]{"id"});
         long authorId = Objects.requireNonNull(keyHolder.getKey()).longValue();
-        authors.add(Author.builder().id(authorId).name(author.getName()).build());
-        return authorId;
+        Author resultingAuthor = Author.builder().id(authorId).name(author.getName()).build();
+        authors.add(resultingAuthor);
+        return resultingAuthor;
     }
 
     @Override
-    public void deleteById(long id) throws AuthorNotFoundException{
+    public void deleteByName(String name) throws AuthorNotFoundException{
         Map<String, Object> params = new HashMap<>();
-        params.put("id", id);
-        authors.stream().filter((a) -> a.getId() == id).findAny().ifPresentOrElse(
-                authors::remove,
+        authors.stream().filter((a) -> a.getName().equals(name)).findAny().ifPresentOrElse(
+                (a) -> {
+                    authors.remove(a);
+                    params.put("id", a.getId());
+                },
                 new Runnable() {
                     @Override
                     public void run() {
-                        throw new AuthorNotFoundException("Author with id " + id  + " was not found");
+                        throw new AuthorNotFoundException("Author with name " + name  + " was not found");
                     }
                 });
-        bookDao.deleteBooksByAuthorId(id);
+        bookDao.deleteBooksByAuthorId((Long) params.get("id"));
         jdbc.update("delete from authors where id = :id", params);
+    }
+
+    @Override
+    public void setAuthors(List<Author> authors){
+        this.authors = new ArrayList<>();
+        this.authors.addAll(authors);
     }
 
     private List<Author> getAllAuthorsFromDB(){

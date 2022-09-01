@@ -7,9 +7,14 @@ import java.util.List;
 
 public interface AuthorDao {
 
-    Author findById(long id);
+    Author findByName(String name);
+
     List<Author> findAll();
-    long insert(Author author);
-    void deleteById(long id);
+
+    Author insert(Author author);
+
+    void deleteByName(String name);
+
+    void setAuthors(List<Author> authors);
 
 }

@@ -3,17 +3,19 @@ package org.example.service;
 import lombok.RequiredArgsConstructor;
 import org.example.dao.GenreDao;
 import org.example.domain.Genre;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @RequiredArgsConstructor
+@Service
 public class GenreServiceImpl implements GenreService{
 
     private final GenreDao dao;
 
     @Override
-    public Genre findById(long id) {
-        return dao.findById(id);
+    public Genre findByName(String name) {
+        return dao.findByName(name);
     }
 
     @Override
@@ -22,12 +24,14 @@ public class GenreServiceImpl implements GenreService{
     }
 
     @Override
-    public long insert(Genre genre) {
+    public Genre insert(Genre genre) {
         return dao.insert(genre);
     }
 
     @Override
-    public void deleteById(long id) {
-        dao.deleteById(id);
+    public void deleteByName(String name) {
+        dao.deleteByName(name);
     }
+
+
 }

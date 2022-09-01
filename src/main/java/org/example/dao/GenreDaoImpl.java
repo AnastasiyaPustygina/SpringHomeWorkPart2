@@ -1,6 +1,7 @@
 package org.example.dao;
 
 import org.example.domain.Genre;
+import org.example.exception.GenreAlreadyExistsException;
 import org.example.exception.GenreNotFoundException;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,17 +13,14 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Repository
 public class GenreDaoImpl implements GenreDao {
 
     private final NamedParameterJdbcOperations jdbc;
     private final BookDao bookDao;
-    private final List<Genre> genres;
+    private List<Genre> genres;
 
     public GenreDaoImpl(NamedParameterJdbcOperations jdbc, @Lazy BookDao bookDao) {
         this.bookDao = bookDao;
@@ -30,10 +28,11 @@ public class GenreDaoImpl implements GenreDao {
         this.genres = getGenresFromDB();
     }
 
+
     @Override
-    public Genre findById(long id) throws GenreNotFoundException{
-        return genres.stream().filter(g -> g.getId() == id).findAny().orElseThrow(
-                () -> new GenreNotFoundException("Genre with id " + id + " was not found"));
+    public Genre findByName(String name) {
+        return genres.stream().filter(g -> g.getName().equals(name)).findAny().orElseThrow( () ->
+                new GenreNotFoundException("genre with name " + name + " was not found"));
     }
 
     @Override
@@ -42,31 +41,43 @@ public class GenreDaoImpl implements GenreDao {
     }
 
     @Override
-    public long insert(Genre genre) {
+    public Genre insert(Genre genre) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("genre_name", genre.getName());
+        if(genres.stream().anyMatch(g -> g.getName().equals(genre.getName())))
+            throw new GenreAlreadyExistsException("genre with name " + genre.getName() + "already exists");
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update("insert into genres (genre_name) values (:genre_name)", params, keyHolder, new String[]{"id"});
         long genreId = Objects.requireNonNull(keyHolder.getKey()).longValue();
-        genres.add(Genre.builder().id(genreId).name(genre.getName()).build());
-        return genreId;
+        Genre resulting_genre = Genre.builder().id(genreId).name(genre.getName()).build();
+        genres.add(resulting_genre);
+        return resulting_genre;
     }
 
     @Override
-    public void deleteById(long id) throws GenreNotFoundException {
+    public void deleteByName(String name) throws GenreNotFoundException {
         Map<String, Object> params = new HashMap<>();
-        params.put("id", id);
-        genres.stream().filter((g) -> g.getId() == id).findAny().ifPresentOrElse(
-                genres::remove, new Runnable() {
+        genres.stream().filter((g) -> g.getName().equals(name)).findAny().ifPresentOrElse(
+                (g) -> {
+                    genres.remove(g);
+                    params.put("id", g.getId());
+                }, new Runnable() {
                     @Override
                     public void run() {
                         throw new GenreNotFoundException(
-                                "Genre with id " + id  + " was not found");
+                                "Genre with name " + name  + " was not found");
                     }
                 });
-        bookDao.deleteBooksByGenreId(id);
+        bookDao.deleteBooksByGenreId((Long) params.get("id"));
         jdbc.update("delete from genres where id = :id", params);
     }
+
+    @Override
+    public void setGenres(List<Genre> genres) {
+        this.genres = new ArrayList<>();
+        this.genres.addAll(genres);
+    }
+
 
     private List<Genre> getGenresFromDB(){
         return jdbc.query("select * from genres", new GenreMapper());
