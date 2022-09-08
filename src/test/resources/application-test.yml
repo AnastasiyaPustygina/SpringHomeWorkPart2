@@ -1,13 +1,13 @@
 server:
   port: 8082
 spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:db.changelog/db.changelog-master.yml
   shell:
     interactive:
       enabled: false
   datasource:
-    initialization-mode: ALWAYS
-    schema: database/test-initDB.sql
-    data: database/test-populateDB.sql
     url: jdbc:postgresql://localhost:5432/libraryTest
     username: postgres
     password: 1240562Na

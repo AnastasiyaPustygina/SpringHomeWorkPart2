@@ -29,6 +29,7 @@ public class AuthorServiceTest {
 
     private static final String EXISTING_AUTHOR_NAME = "Boris Akunin";
     private static final int EXISTING_AUTHOR_ID = 1;
+    public static final String NEW_AUTHOR_NAME = "newAuthorName";
 
     @Mock
     private AuthorDao dao;
@@ -71,8 +72,8 @@ public class AuthorServiceTest {
     @DisplayName("должен добавлять автора")
     @Test
     void shouldInsertAuthor(){
-        Author author = Author.builder().id(EXISTING_AUTHOR_ID)
-                .name(EXISTING_AUTHOR_NAME).build();
+        Author author = Author.builder().name(NEW_AUTHOR_NAME).build();
+        given(dao.findByName(author.getName())).willThrow(AuthorNotFoundException.class);
         given(dao.insert(author)).willReturn(author);
         assertEquals(authorServiceImpl.insert(author), author);
     }

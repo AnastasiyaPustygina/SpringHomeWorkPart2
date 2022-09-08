@@ -4,7 +4,6 @@ import org.example.domain.Author;
 import org.example.domain.Book;
 import org.example.domain.Genre;
 import org.example.exception.AuthorNotFoundException;
-import org.example.exception.BookAlreadyExistsException;
 import org.example.exception.BookNotFoundException;
 import org.example.exception.GenreNotFoundException;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,32 +12,25 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-
-import javax.security.auth.login.AccountNotFoundException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Repository
 public class BookDaoImpl implements BookDao {
 
     private final NamedParameterJdbcOperations jdbc;
-    private final AuthorDao authorDao;
-    private final GenreDao genreDao;
     private List<Book> books;
 
-    public BookDaoImpl(NamedParameterJdbcOperations jdbc, AuthorDao authorDao, GenreDao genreDao) {
+    public BookDaoImpl(NamedParameterJdbcOperations jdbc) {
         this.jdbc = jdbc;
-        this.authorDao = authorDao;
-        this.genreDao = genreDao;
         books = getAllBooksFromDB();
     }
 
 
     @Override
-    public Book findByTitle(String title) {
+    public Book findByTitle(String title) throws BookNotFoundException{
         return books.stream().filter(b -> b.getTitle().equals(title)).findAny().orElseThrow(
                 () -> new BookNotFoundException("book with title " + title + " was not found"));
     }
@@ -50,19 +42,16 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     public Book insert(Book book) {
-        long authorId = insertAuthorIfItDoesntExist(book.getAuthor());
-        long genreId = insertGenreIfItDoesntExist(book.getGenre());
+        long authorId = book.getAuthor().getId();
+        long genreId = book.getGenre().getId();
         MapSqlParameterSource params = new MapSqlParameterSource();
-        if(books.stream().anyMatch(b -> b.getTitle().equals(book.getTitle())))
-            throw new BookAlreadyExistsException("book with title " + book.getTitle() + " already exists");
         params.addValue("title", book.getTitle());
-        params.addValue("book_text", book.getText());
+        params.addValue("text", book.getText());
         params.addValue("author_id", authorId);
         params.addValue("genre_id", genreId);
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbc.update("insert into books (title, book_text, author_id, genre_id) values " +
-                "(:title, :book_text, :author_id, :genre_id)", params, keyHolder, new String[]{"id"});
-        long bookId = Objects.requireNonNull(keyHolder.getKey()).longValue();
+        jdbc.update("insert into books (title, text, author_id, genre_id) values " +
+                "(:title, :text, :author_id, :genre_id)", params);
+        long bookId = getBookIdFromDB(book.getTitle());
         Book resultingBook = Book.builder().id(bookId).title(book.getTitle()).text(book.getText())
                 .author(Author.builder().id(authorId).name(book.getAuthor().getName()).build())
                 .genre(Genre.builder().id(genreId).name(book.getGenre().getName()).build()).build();
@@ -71,18 +60,12 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
-    public void deleteByTitle(String title) throws BookNotFoundException{
+    public void deleteByTitle(String title){
         Map<String, Object> params = new HashMap<>();
-        books.stream().filter((b) -> b.getTitle().equals(title)).findAny().ifPresentOrElse(
+        books.stream().filter((b) -> b.getTitle().equals(title)).findAny().ifPresent(
                 (b) -> {
                     books.remove(b);
                     params.put("id", b.getId());
-                },
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        throw new BookNotFoundException("Book with title " + title + " was not found");
-                    }
                 });
         jdbc.update("delete from books where id = :id", params);
     }
@@ -110,23 +93,15 @@ public class BookDaoImpl implements BookDao {
 
 
     private List<Book> getAllBooksFromDB(){
-        return jdbc.query("select * from books inner join authors on books.author_id = authors.id " +
+        return jdbc.query("select books.id, books.title, books.text, books.author_id," +
+                "books.genre_id, authors.name as author_name, genres.name as genre_name " +
+                " from books inner join authors on books.author_id = authors.id " +
                 "join genres on books.genre_id = genres.id", new BookMapper());
     }
-
-    private long insertAuthorIfItDoesntExist(Author author) {
-        try {
-            return authorDao.findByName(author.getName()).getId();
-        } catch (AuthorNotFoundException e) {
-            return authorDao.insert(author).getId();
-        }
-    }
-    private long insertGenreIfItDoesntExist(Genre genre){
-        try {
-            return genreDao.findByName(genre.getName()).getId();
-        } catch (GenreNotFoundException e) {
-            return genreDao.insert(genre).getId();
-        }
+    private long getBookIdFromDB(String title){
+        RowMapper<Integer> rowMapper = (rs, rowNum) -> rs.getInt("id");
+        return jdbc.query("select id from books where " +
+                "title = '" + title + "'", rowMapper).get(0);
     }
     private static class BookMapper implements RowMapper<Book>{
 
@@ -135,7 +110,7 @@ public class BookDaoImpl implements BookDao {
 
             long id = rs.getLong("id");
             String title = rs.getString("title");
-            String text = rs.getString("book_text");
+            String text = rs.getString("text");
             Author author = Author.builder().id(rs.getLong("author_id")).
                     name(rs.getString("author_name")).build();
             Genre genre = Genre.builder().id(rs.getLong("genre_id")).

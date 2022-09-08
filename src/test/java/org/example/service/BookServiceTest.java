@@ -1,6 +1,8 @@
 package org.example.service;
 
+import org.example.dao.AuthorDao;
 import org.example.dao.BookDao;
+import org.example.dao.GenreDao;
 import org.example.domain.Author;
 import org.example.domain.Book;
 import org.example.domain.Genre;
@@ -38,12 +40,16 @@ public class BookServiceTest {
 
     @Mock
     private BookDao dao;
+    @Mock
+    private GenreDao genreDao;
+    @Mock
+    private AuthorDao authorDao;
     @InjectMocks
     private BookServiceImpl bookServiceImpl;
 
     @BeforeEach
     void setUp(){
-        bookServiceImpl = new BookServiceImpl(dao);
+        bookServiceImpl = new BookServiceImpl(dao, genreDao, authorDao);
     }
 
     @DisplayName("должен находить книгу по названию")
@@ -78,9 +84,14 @@ public class BookServiceTest {
     @DisplayName("должен добавлять автора")
     @Test
     void shouldInsertBook(){
+        Author author = Author.builder().id(EXISTING_AUTHOR_ID).name(EXISTING_AUTHOR_NAME).build();
+        Genre genre = Genre.builder().id(EXISTING_GENRE_ID).name(EXISTING_GENRE_NAME).build();
         Book book = Book.builder().id(EXISTING_BOOK_ID).title(EXISTING_BOOK_TITLE).text(EXISTING_BOOK_TEXT)
-                .author(Author.builder().id(EXISTING_AUTHOR_ID).name(EXISTING_AUTHOR_NAME).build())
-                .genre(Genre.builder().id(EXISTING_GENRE_ID).name(EXISTING_GENRE_NAME).build()).build();
+                .author(author)
+                .genre(genre).build();
+        given(authorDao.findByName(EXISTING_AUTHOR_NAME)).willReturn(author);
+        given(genreDao.findByName(EXISTING_GENRE_NAME)).willReturn(genre);
+        given(dao.findByTitle(book.getTitle())).willThrow(BookNotFoundException.class);
         given(dao.insert(book)).willReturn(book);
         assertEquals(bookServiceImpl.insert(book), book);
     }
