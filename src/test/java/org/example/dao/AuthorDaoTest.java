@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -17,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @JdbcTest
-@Import({AuthorDaoImpl.class, BookDaoImpl.class, GenreDaoImpl.class})
+@Import({AuthorDaoImpl.class})
 @DisplayName("Класс AuthorDao")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")

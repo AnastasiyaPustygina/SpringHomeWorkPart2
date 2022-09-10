@@ -27,6 +27,7 @@ import static org.mockito.Mockito.doThrow;
 public class GenreServiceTest {
     private static final String EXISTING_GENRE_NAME = "detective";
     private static final int EXISTING_GENRE_ID = 1;
+    public static final String NEW_GENRE_NAME = "newGenreName";
 
     @Mock
     private GenreDao dao;
@@ -60,8 +61,7 @@ public class GenreServiceTest {
     @DisplayName("должен удалять жанр по имени")
     @Test
     void shouldDeleteGenreByName(){
-        doThrow(new GenreNotFoundException("genre with name " + EXISTING_GENRE_NAME + " was not found"))
-                .when(dao).deleteByName(EXISTING_GENRE_NAME);
+        given(dao.findByName(EXISTING_GENRE_NAME)).willThrow(GenreNotFoundException.class);
         assertThrows(GenreNotFoundException.class,
                 () -> genreServiceImpl.deleteByName(EXISTING_GENRE_NAME));
     }
@@ -69,8 +69,8 @@ public class GenreServiceTest {
     @DisplayName("должен добавлять жанр")
     @Test
     void shouldInsertGenre(){
-        Genre genre = Genre.builder().id(EXISTING_GENRE_ID)
-                .name(EXISTING_GENRE_NAME).build();
+        Genre genre = Genre.builder().name(NEW_GENRE_NAME).build();
+        given(dao.findByName(genre.getName())).willThrow(GenreNotFoundException.class);
         given(dao.insert(genre)).willReturn(genre);
         assertEquals(genreServiceImpl.insert(genre), genre);
     }
