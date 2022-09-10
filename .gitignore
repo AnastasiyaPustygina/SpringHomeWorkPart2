@@ -33,3 +33,6 @@ build/
 .vscode/
 
 /spring-shell.log
+.mvn
+/mvnnw.cmd
+/mvnw
