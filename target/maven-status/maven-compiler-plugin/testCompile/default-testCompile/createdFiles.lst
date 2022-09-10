@@ -1,6 +1,0 @@
-org\example\service\AuthorServiceTest.class
-org\example\dao\GenreDaoTest.class
-org\example\dao\AuthorDaoTest.class
-org\example\dao\BookDaoTest.class
-org\example\service\GenreServiceTest.class
-org\example\service\BookServiceTest.class
