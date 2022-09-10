@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: org.example.dao.AuthorDaoTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 20.698 s - in org.example.dao.AuthorDaoTest

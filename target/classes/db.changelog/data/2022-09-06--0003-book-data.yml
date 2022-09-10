@@ -1,0 +1,13 @@
+databaseChangeLog:
+- changeSet:
+    id: 2022-09-06--0003-book-data
+    author: apustygina
+    runOnCange: true
+    loadData:
+      primaryKey: id
+      file: csv/2022-09-06--0003-book-data.csv
+      relativeToChangelogFile: true
+      separator: ;
+      quotChar: '"'
+      encoding: UTF-8
+      tableName: books
