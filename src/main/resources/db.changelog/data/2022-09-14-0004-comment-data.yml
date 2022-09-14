@@ -1,13 +1,13 @@
 databaseChangeLog:
 - changeSet:
-    id: 2022-09-06--0003-book-data
+    id: 2022-09-14-0004-comment-data
     author: apustygina
     runOnChange: true
     loadData:
       primaryKey: id
-      file: csv/2022-09-06--0003-book-data.csv
+      file: csv/2022-09-14--0004-comment-data.csv
       relativeToChangelogFile: true
       separator: ;
       quotChar: '"'
       encoding: UTF-8
-      tableName: books
+      tableName: comments

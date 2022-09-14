@@ -1,20 +1,19 @@
 package org.example.service;
 
-import liquibase.pro.packaged.B;
-import lombok.RequiredArgsConstructor;
-import org.example.dao.AuthorDao;
+
+import org.example.exception.*;
+import org.example.domain.Book;
 import org.example.dao.BookDao;
 import org.example.dao.GenreDao;
-import org.example.domain.Author;
-import org.example.domain.Book;
 import org.example.domain.Genre;
-import org.example.exception.AuthorNotFoundException;
-import org.example.exception.BookAlreadyExistsException;
-import org.example.exception.BookNotFoundException;
-import org.example.exception.GenreNotFoundException;
+import org.example.domain.Author;
+import org.example.dao.AuthorDao;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +25,8 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book findByTitle(String title) {
-        return bookDao.findByTitle(title);
+        return bookDao.findByTitle(title).orElseThrow(() -> new BookNotFoundException(
+                "book with title " + title + " was not found"));
     }
 
     @Override
@@ -35,40 +35,33 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public Book insert(Book book) {
-        insertAuthorIfItDoesntExists(book.getAuthor());
-        insertGenreIfItDoesntExists(book.getGenre());
-        try {
-            bookDao.findByTitle(book.getTitle());
+        Author author = getOrInsertAuthor(book.getAuthor());
+        Genre genre = getOrInsertGenre(book.getGenre());
+        if(bookDao.findByTitle(book.getTitle()).isPresent()) {
             throw new BookAlreadyExistsException("book with title " + book.getTitle() + " already exists");
-        } catch (BookNotFoundException e) {
-            return bookDao.insert(Book.builder().id(book.getId()).title(book.getTitle()).text(book.getText())
-                    .author(authorDao.findByName(book.getAuthor().getName())).genre(
-                            genreDao.findByName(book.getGenre().getName())).build());
         }
+        return bookDao.insert(Book.builder().title(book.getTitle())
+            .text(book.getText()).author(author).genre(genre).build());
     }
 
     @Override
+    @Transactional
     public void deleteByTitle(String title) {
-        try{
-            bookDao.findByTitle(title);
-            bookDao.deleteByTitle(title);
-        }catch (BookNotFoundException e){
-            throw new BookNotFoundException("Book with title " + title + " was not found");
+        if(bookDao.findByTitle(title).isEmpty()){
+            throw new BookNotFoundException("book with title " + title + " was not found");
         }
+        bookDao.deleteByTitle(title);
     }
-    private void insertAuthorIfItDoesntExists(Author author) {
-        try{
-            authorDao.findByName(author.getName());
-        }catch (AuthorNotFoundException e){
-            authorDao.insert(author);
-        }
+
+    private Author getOrInsertAuthor(Author author) {
+        Optional<Author> optAuthor = authorDao.findByName(author.getName());
+        return optAuthor.isEmpty() ? authorDao.insert(author) : optAuthor.get();
+
     }
-    private void insertGenreIfItDoesntExists(Genre genre){
-        try{
-            genreDao.findByName(genre.getName());
-        }catch (GenreNotFoundException e){
-            genreDao.insert(genre);
-        }
+    private Genre getOrInsertGenre(Genre genre){
+        Optional<Genre> optGenre = genreDao.findByName(genre.getName());
+        return optGenre.isEmpty() ? genreDao.insert(genre) : optGenre.get();
     }
 }

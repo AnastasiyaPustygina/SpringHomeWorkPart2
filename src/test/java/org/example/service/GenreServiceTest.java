@@ -1,78 +1,90 @@
 package org.example.service;
 
-import org.example.dao.GenreDao;
+import java.util.List;
+import org.mockito.Mock;
+import java.util.Optional;
+import java.util.ArrayList;
 import org.example.domain.Genre;
-import org.example.exception.GenreNotFoundException;
+import org.example.dao.GenreDao;
+import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.example.exception.GenreNotFoundException;
+import org.springframework.test.context.ActiveProfiles;
+import org.example.exception.GenreAlreadyExistsException;
+import org.springframework.boot.test.context.SpringBootTest;
 
 @DisplayName("Класс GenreService")
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
 @ActiveProfiles("test")
 public class GenreServiceTest {
+
     private static final String EXISTING_GENRE_NAME = "detective";
     private static final int EXISTING_GENRE_ID = 1;
+    private static final String EXISTING_GENRE_NAME2 = "fantastic";
+    private static final int EXISTING_GENRE_ID2 = 2;
     public static final String NEW_GENRE_NAME = "newGenreName";
 
     @Mock
     private GenreDao dao;
-    @InjectMocks
-    private GenreServiceImpl genreServiceImpl;
+
+    private GenreService genreService;
+
+    private final List<Genre> genres = new ArrayList<>();
 
     @BeforeEach
     void setUp(){
-        genreServiceImpl = new GenreServiceImpl(dao);
+        genreService = new GenreServiceImpl(dao);
+        genres.clear();
+        Genre genre1 = Genre.builder().id(EXISTING_GENRE_ID).name(EXISTING_GENRE_NAME).build();
+        Genre genre2 = Genre.builder().id(EXISTING_GENRE_ID2).name(EXISTING_GENRE_NAME2).build();
+        genres.add(genre1);
+        genres.add(genre2);
     }
 
     @DisplayName("должен найти жанр по имени")
     @Test
     void shouldFindGenreByName(){
-        Genre genre = Genre.builder().id(EXISTING_GENRE_ID)
-                .name(EXISTING_GENRE_NAME).build();
-        given(dao.findByName(EXISTING_GENRE_NAME)).willReturn(genre);
-        assertEquals(genre, genreServiceImpl.findByName(EXISTING_GENRE_NAME));
+        given(dao.findByName(EXISTING_GENRE_NAME)).willReturn(Optional.of(genres.get(0)));
+        assertEquals(genres.get(0), genreService.findByName(EXISTING_GENRE_NAME));
     }
 
     @DisplayName("должен найти все жанры")
     @Test
     void shouldFindAllGenres(){
-        List<Genre> genres = List.of(Genre.builder().id(EXISTING_GENRE_ID)
-                .name(EXISTING_GENRE_NAME).build());
         given(dao.findAll()).willReturn(genres);
-        System.out.println(genreServiceImpl.findAll());
-        assertEquals(genres, genreServiceImpl.findAll());
+        System.out.println(genreService.findAll());
+        assertEquals(genres, genreService.findAll());
     }
 
-    @DisplayName("должен удалять жанр по имени")
+    @DisplayName("должен удалить жанр по имени")
     @Test
     void shouldDeleteGenreByName(){
-        given(dao.findByName(EXISTING_GENRE_NAME)).willThrow(GenreNotFoundException.class);
-        assertThrows(GenreNotFoundException.class,
-                () -> genreServiceImpl.deleteByName(EXISTING_GENRE_NAME));
+        given(dao.findByName(EXISTING_GENRE_NAME)).willReturn(Optional.of(genres.get(0)));
+        genreService.deleteByName(EXISTING_GENRE_NAME);
+        assertAll(
+                () -> verify(dao, times(1)).deleteByName(any()),
+                () -> assertThrows(GenreNotFoundException.class, () -> genreService.deleteByName(NEW_GENRE_NAME))
+        );
     }
 
-    @DisplayName("должен добавлять жанр")
+    @DisplayName("должен добавить жанр")
     @Test
     void shouldInsertGenre(){
         Genre genre = Genre.builder().name(NEW_GENRE_NAME).build();
-        given(dao.findByName(genre.getName())).willThrow(GenreNotFoundException.class);
         given(dao.insert(genre)).willReturn(genre);
-        assertEquals(genreServiceImpl.insert(genre), genre);
+        assertAll(
+                () -> assertEquals(genreService.insert(genre).getName(), genre.getName()),
+                () -> assertThrows(GenreAlreadyExistsException.class, () -> genreService.insert(
+                        genres.get(0)))
+        );
     }
 }
 

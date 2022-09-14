@@ -1,0 +1,20 @@
+databaseChangeLog:
+- changeSet:
+    id: 2022-09-14--0004-comment
+    author: apustygina
+    createTable:
+      tableName: comments
+      columns:
+      - column:
+          name: id
+          type: bigint
+          autoIncrement: true
+          constraints:
+            nullable: false
+            primaryKey: true
+            primaryKeyName: pk_comment
+      - column:
+            name: text
+            type: varchar(300)
+            constraints:
+              nullable: false

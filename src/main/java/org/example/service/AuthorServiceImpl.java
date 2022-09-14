@@ -1,11 +1,12 @@
 package org.example.service;
 
-import lombok.RequiredArgsConstructor;
 import org.example.dao.AuthorDao;
 import org.example.domain.Author;
-import org.example.exception.AuthorAlreadyExistsException;
-import org.example.exception.AuthorNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.example.exception.AuthorNotFoundException;
+import org.example.exception.AuthorAlreadyExistsException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,8 +17,9 @@ public class AuthorServiceImpl implements AuthorService{
     private final AuthorDao dao;
 
     @Override
-    public Author findByName(String name) {
-        return dao.findByName(name);
+    public Author findByName(String name) throws AuthorNotFoundException {
+        return dao.findByName(name).orElseThrow(() -> new AuthorNotFoundException(
+                "author with name " + name + " was not found"));
     }
 
     @Override
@@ -26,23 +28,21 @@ public class AuthorServiceImpl implements AuthorService{
     }
 
     @Override
+    @Transactional
     public Author insert(Author author) throws AuthorAlreadyExistsException {
-        try{
-            findByName(author.getName());
-            throw new AuthorAlreadyExistsException(
-                    "author with name " + author.getName() + " already exists");
-        }catch (AuthorNotFoundException e){
+        if(author.getId() <= 0) {
             return dao.insert(author);
         }
+        throw new AuthorAlreadyExistsException("author with name " + author.getName() +
+                    " already exists");
     }
 
     @Override
+    @Transactional
     public void deleteByName(String name) throws AuthorNotFoundException{
-        try {
-            dao.findByName(name);
-            dao.deleteByName(name);
-        }catch (AuthorNotFoundException e){
+        if(dao.findByName(name).isEmpty()){
             throw new AuthorNotFoundException("Author with name " + name  + " was not found");
         }
+        dao.deleteByName(name);
     }
 }

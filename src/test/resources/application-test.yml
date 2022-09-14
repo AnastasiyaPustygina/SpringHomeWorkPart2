@@ -13,5 +13,9 @@ spring:
     password: 1240562Na
     driver-class-name: org.postgresql.Driver
     jpa:
+      showsql: true
       database: postresql
+      generate-ddl: false
       database-platform: org.hibernate.dialect.PostreSQL10Dialect
+      hibernate:
+        ddl-auto: none

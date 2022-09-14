@@ -1,12 +1,12 @@
 package org.example.service;
 
-import lombok.RequiredArgsConstructor;
 import org.example.dao.GenreDao;
 import org.example.domain.Genre;
-import org.example.exception.AuthorNotFoundException;
-import org.example.exception.GenreAlreadyExistsException;
-import org.example.exception.GenreNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.example.exception.GenreNotFoundException;
+import org.example.exception.GenreAlreadyExistsException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,7 +18,8 @@ public class GenreServiceImpl implements GenreService{
 
     @Override
     public Genre findByName(String name) {
-        return dao.findByName(name);
+        return dao.findByName(name).orElseThrow(() -> new GenreNotFoundException(
+                "genre with name " + name + " was not found"));
     }
 
     @Override
@@ -27,23 +28,22 @@ public class GenreServiceImpl implements GenreService{
     }
 
     @Override
+    @Transactional
     public Genre insert(Genre genre) {
-        try{
-            dao.findByName(genre.getName());
-            throw new GenreAlreadyExistsException("genre with name " + genre.getName() + " already exists");
-        }catch (GenreNotFoundException e) {
+        if (genre.getId() <= 0){
             return dao.insert(genre);
         }
+        throw new GenreAlreadyExistsException("genre with name " + genre.getName() +
+                " already exists");
     }
 
     @Override
+    @Transactional
     public void deleteByName(String name) {
-        try{
-            dao.findByName(name);
-            dao.deleteByName(name);
-        }catch (GenreNotFoundException e) {
-            throw new GenreNotFoundException("Genre with name " + name  + " was not found");
+        if(dao.findByName(name).isEmpty()){
+            throw new GenreNotFoundException("genre with name " + name + " was not found");
         }
+        dao.deleteByName(name);
     }
 
 
