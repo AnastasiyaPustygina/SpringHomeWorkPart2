@@ -20,7 +20,7 @@ public class Comment {
     @Column(name = "text")
     private String text;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
     private Book book;
 

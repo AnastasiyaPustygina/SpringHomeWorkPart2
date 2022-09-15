@@ -34,13 +34,14 @@ public class CommentDaoImpl implements CommentDao{
     @Override
     public Comment insert(Comment comment) {
         Book book = comment.getBook();
+        if(book.getId() > 0) book = entityManager.merge(book);
         Author author = book.getAuthor().getId() > 0 ? entityManager.merge(book.getAuthor()) :
                 book.getAuthor();
         Genre genre = book.getGenre().getId() > 0 ? entityManager.merge(book.getGenre()) :
                 book.getGenre();
-        if(book.getId() > 0) book = entityManager.merge(Book.builder().title(book.getTitle())
-                .text(book.getText()).author(author).genre(genre).comments(Collections.emptyList()).build());
-        Comment resultingComment = Comment.builder().text(comment.getText()).book(book).build();
+        Book resultingBook = Book.builder().id(book.getId()).title(book.getTitle())
+                .text(book.getText()).author(author).genre(genre).comments(Collections.emptyList()).build();
+        Comment resultingComment = Comment.builder().text(comment.getText()).book(resultingBook).build();
         entityManager.persist(resultingComment);
         return resultingComment;
     }
