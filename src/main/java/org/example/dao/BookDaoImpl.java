@@ -17,8 +17,10 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     public Optional<Book> findByTitle(String title) {
+        EntityGraph<?> entityGraph = entityManager.getEntityGraph("books-entity-graph");
         TypedQuery<Book> query = entityManager.createQuery(
                 "select b from Book b where b.title = :title", Book.class);
+        query.setHint("javax.persistence.fetchgraph", entityGraph);
         query.setParameter("title", title);
         try{
             return Optional.ofNullable(query.getSingleResult());
@@ -29,7 +31,9 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     public List<Book> findAll() {
+        EntityGraph<?> entityGraph = entityManager.getEntityGraph("books-entity-graph");
         TypedQuery<Book> query = entityManager.createQuery("select b from Book b", Book.class);
+        query.setHint("javax.persistence.fetchgraph", entityGraph);
         return query.getResultList();
     }
 

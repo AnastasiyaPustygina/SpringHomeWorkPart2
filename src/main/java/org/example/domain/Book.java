@@ -1,6 +1,8 @@
 package org.example.domain;
 
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -13,6 +15,8 @@ import java.util.stream.IntStream;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "books")
+@NamedEntityGraph(name = "books-entity-graph", attributeNodes = {@NamedAttributeNode("author"),
+@NamedAttributeNode("genre")})
 public class Book {
 
     @Id
@@ -33,6 +37,7 @@ public class Book {
     @JoinColumn(name = "genre_id")
     private Genre genre;
 
+    @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = Comment.class, cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "book")
     private List<Comment> comments;
 
