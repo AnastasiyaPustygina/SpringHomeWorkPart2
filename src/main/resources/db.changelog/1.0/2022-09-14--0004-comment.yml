@@ -14,7 +14,15 @@ databaseChangeLog:
             primaryKey: true
             primaryKeyName: pk_comment
       - column:
-            name: text
-            type: varchar(300)
-            constraints:
-              nullable: false
+          name: text
+          type: varchar(300)
+          constraints:
+            nullable: false
+      - column:
+          name: book_id
+          type: bigint
+          constraints:
+            nullable: false
+            foreignKeyName: fk_comment_book
+            references: books(id)
+            deleteCascade: true

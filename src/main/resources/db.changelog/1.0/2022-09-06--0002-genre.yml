@@ -1,6 +1,6 @@
 databaseChangeLog:
 - changeSet:
-    id: 2022-09-06--0001-genre
+    id: 2022-09-06--0002-genre
     author: apustygina
     createTable:
       tableName: genres
@@ -14,7 +14,7 @@ databaseChangeLog:
             primaryKey: true
             primaryKeyName: pk_genre
       - column:
-            name: name
-            type: varchar(200)
-            constraints:
-              nullable: false
+          name: name
+          type: varchar(200)
+          constraints:
+            nullable: false

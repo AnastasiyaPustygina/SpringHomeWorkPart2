@@ -1,4 +1,4 @@
 FROM adoptopenjdk:16-jre-hotspot
-COPY /target/springHW2.jar /springHW2.jar
+COPY /target/SpringHW2-1.0-SNAPSHOT.jar /springHW2.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/springHW2.jar"]

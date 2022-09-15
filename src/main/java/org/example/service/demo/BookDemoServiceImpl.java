@@ -7,6 +7,7 @@ import org.example.domain.Genre;
 import org.example.service.BookService;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Scanner;
 
 @Service
@@ -30,7 +31,7 @@ public class BookDemoServiceImpl implements BookDemoService{
         System.out.println(ENTER_GENRE_NAME);
         String genre_name = scanner.nextLine();
         bookService.insert(Book.builder().title(title).text(text).author(Author.builder().name(author_name)
-                .build()).genre(Genre.builder().name(genre_name).build()).build());
+                .build()).genre(Genre.builder().name(genre_name).build()).comments(Collections.emptyList()).build());
     }
 
     @Override

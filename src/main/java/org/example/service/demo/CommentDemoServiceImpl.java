@@ -3,6 +3,7 @@ package org.example.service.demo;
 import java.util.Scanner;
 import org.example.domain.Comment;
 import lombok.RequiredArgsConstructor;
+import org.example.service.BookService;
 import org.example.service.CommentService;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +13,12 @@ import org.springframework.stereotype.Service;
 public class CommentDemoServiceImpl implements CommentDemoService{
 
     private static final String ENTER_COMMENT_ID = "Enter the comment id";
+    private static final String ENTER_BOOK_TITLE = "Enter the book title";
     private static final String ENTER_COMMENT_TEXT = "Enter the new comment text";
+
     private final CommentService commentService;
+    private final BookService bookService;
+
     private final Scanner scanner = new Scanner(System.in);
 
     @Override
@@ -29,8 +34,11 @@ public class CommentDemoServiceImpl implements CommentDemoService{
 
     @Override
     public void insert() {
+        System.out.println(ENTER_BOOK_TITLE);
+        String bookTitle = scanner.nextLine();
         System.out.println(ENTER_COMMENT_TEXT);
-        System.out.println(commentService.insert(Comment.builder().text(scanner.nextLine()).build()));
+        commentService.insert(Comment.builder().text(scanner.nextLine()).book(
+                bookService.findByTitle(bookTitle)).build());
     }
 
     @Override

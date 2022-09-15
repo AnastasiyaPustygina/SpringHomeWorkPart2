@@ -1,6 +1,8 @@
 package org.example.dao;
 
+import org.example.domain.Author;
 import org.example.domain.Book;
+import org.example.domain.Genre;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
@@ -33,11 +35,14 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     public Book insert(Book book) {
-        if(book.getId() == 0){
-            entityManager.persist(book);
-            return book;
-        }
-        return entityManager.merge(book);
+        Author author = book.getAuthor().getId() > 0 ? entityManager.merge(book.getAuthor()) :
+                book.getAuthor();
+        Genre genre = book.getGenre().getId() > 0 ? entityManager.merge(book.getGenre()) :
+                book.getGenre();
+        Book resultingBook = Book.builder().title(book.getTitle()).text(book.getText())
+                .author(author).genre(genre).comments(Collections.emptyList()).build();
+        entityManager.persist(resultingBook);
+        return resultingBook;
     }
 
     @Override

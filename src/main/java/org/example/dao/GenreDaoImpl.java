@@ -31,11 +31,8 @@ public class GenreDaoImpl implements GenreDao {
 
     @Override
     public Genre insert(Genre genre) {
-        if(genre.getId() <= 0){
-            entityManager.persist(genre);
-            return genre;
-        }
-        return entityManager.merge(genre);
+        entityManager.persist(genre);
+        return genre;
     }
 
     @Override

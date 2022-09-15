@@ -20,15 +20,9 @@ public class Comment {
     @Column(name = "text")
     private String text;
 
-//    было бы неплохо привязать коммент к написавшему его пользователю
-//    @JoinColumn(name = "user_id")
-//    @Getter
-//    @Setter
-//    Если рассматривать реальные комменты, то подгрузка скорее всего должна быть в
-//    любом случае, т.к. только текст комментария без указания на написавшего мы
-//    никогда не увидим (FetchType.EAGER)
-//    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    User user;
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id")
+    private Book book;
 
     @Override
     public String toString() {

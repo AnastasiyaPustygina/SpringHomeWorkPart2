@@ -47,9 +47,7 @@ public class BookServiceTest {
     private static final String NEW_BOOK_TITLE = "The player who climbed to the top";
     private static final String NEW_BOOK_TEXT = "text of the book with name" +
             " <<The player who climbed to the top>>";
-    private static final int NEW_AUTHOR_ID = 2;
     private static final String NEW_AUTHOR_NAME = "Leach23";
-    private static final int NEW_GENRE_ID = 2;
     private static final String NEW_GENRE_NAME = "fantastic";
 
     @Mock

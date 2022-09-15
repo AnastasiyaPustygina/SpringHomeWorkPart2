@@ -14,7 +14,7 @@ databaseChangeLog:
             primaryKey: true
             primaryKeyName: pk_author
       - column:
-            name: name
-            type: varchar(200)
-            constraints:
-              nullable: false
+          name: name
+          type: varchar(200)
+          constraints:
+            nullable: false

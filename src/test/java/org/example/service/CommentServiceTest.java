@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.example.dao.BookDao;
 import org.example.dao.CommentDao;
 import org.example.domain.Comment;
 import org.example.exception.CommentAlreadyExistsException;
@@ -31,6 +32,7 @@ import static org.mockito.Mockito.verify;
 public class CommentServiceTest {
 
     private static final String EXISTING_COMMENT_TEXT = "Content of first comment";
+    private static final String EXISTING_BOOK_TITLE = "Content of first comment";
     private static final long EXISTING_COMMENT_ID = 1;
     private static final String EXISTING_COMMENT_TEXT2 = "Content of second comment";
     private static final long EXISTING_COMMENT_ID2 = 2;
@@ -40,6 +42,8 @@ public class CommentServiceTest {
 
     @Mock
     private CommentDao dao;
+    @Mock
+    private BookDao bookDao;
 
     private CommentService commentService;
 
@@ -47,7 +51,7 @@ public class CommentServiceTest {
 
     @BeforeEach
     void setUp(){
-        commentService = new CommentServiceImpl(dao);
+        commentService = new CommentServiceImpl(dao, bookDao);
         comments.clear();
         Comment comment1 = Comment.builder().id(EXISTING_COMMENT_ID).text(EXISTING_COMMENT_TEXT).build();
         Comment comment2 = Comment.builder().id(EXISTING_COMMENT_ID2).text(EXISTING_COMMENT_TEXT2).build();
@@ -83,7 +87,7 @@ public class CommentServiceTest {
 
     @DisplayName("должен добавлить коментарий")
     @Test
-    void shouldInsertAuthor(){
+    void shouldInsertComment(){
         Comment comment = Comment.builder().text(NEW_COMMENT_TEXT).build();
         given(dao.insert(comment)).willReturn(comment);
         assertAll(

@@ -1,8 +1,11 @@
 package org.example.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.dao.BookDao;
 import org.example.dao.CommentDao;
+import org.example.domain.Book;
 import org.example.domain.Comment;
+import org.example.exception.BookNotFoundException;
 import org.example.exception.CommentAlreadyExistsException;
 import org.example.exception.CommentNotFoundException;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,7 @@ import java.util.List;
 public class CommentServiceImpl implements CommentService{
 
     private final CommentDao dao;
+    private final BookDao bookDao;
 
     @Override
     public Comment findById(long id) throws CommentNotFoundException{
@@ -29,7 +33,8 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     @Transactional
-    public Comment insert(Comment comment) throws CommentAlreadyExistsException{
+    public Comment insert(Comment comment) throws CommentAlreadyExistsException,
+            BookNotFoundException{
         if(comment.getId() <= 0){
             return dao.insert(comment);
         }

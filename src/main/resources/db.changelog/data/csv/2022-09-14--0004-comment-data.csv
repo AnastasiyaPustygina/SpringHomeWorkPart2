@@ -1,4 +1,4 @@
-text
-Content of first comment
-Content of second comment
-Content of third comment
+text;book_id
+Content of first comment;1
+Content of second comment;1
+Content of third comment;2

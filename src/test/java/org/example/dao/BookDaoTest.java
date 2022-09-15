@@ -11,11 +11,13 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Collections;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-@Import({AuthorDaoImpl.class, BookDaoImpl.class, GenreDaoImpl.class})
+@Import({AuthorDaoImpl.class, BookDaoImpl.class, GenreDaoImpl.class, CommentDaoImpl.class})
 @DisplayName("Класс BookDao")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
@@ -55,7 +57,7 @@ public class BookDaoTest {
         long count_before = bookDao.findAll().size();
         Book book = Book.builder().title(NEW_BOOK_TITLE).text(NEW_BOOK_TEXT).author(Author.builder()
                         .id(EXISTING_AUTHOR_ID).name(EXISTING_AUTHOR_NAME).build()).genre(Genre.builder()
-                .id(EXISTING_GENRE_ID).name(EXISTING_GENRE_NAME).build()).build();
+                .id(EXISTING_GENRE_ID).name(EXISTING_GENRE_NAME).build()).comments(Collections.emptyList()).build();
         Book resultingBook = bookDao.insert(book);
         assertAll(
                 () -> assertEquals(resultingBook.getTitle(), book.getTitle()),

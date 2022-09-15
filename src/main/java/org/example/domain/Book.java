@@ -3,6 +3,8 @@ package org.example.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.stream.IntStream;
 
 @Entity
 @Getter
@@ -24,10 +26,15 @@ public class Book {
     private String text;
 
     @ManyToOne(targetEntity = Author.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
     private Author author;
 
-    @ManyToOne(targetEntity = Genre.class, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = Genre.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "genre_id")
     private Genre genre;
+
+    @OneToMany(targetEntity = Comment.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "book")
+    private List<Comment> comments;
 
     @Override
     public String toString() {

@@ -1,7 +1,9 @@
 package org.example.dao;
 
-import liquibase.pro.packaged.c;
+import org.example.domain.Author;
+import org.example.domain.Book;
 import org.example.domain.Comment;
+import org.example.domain.Genre;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.util.Collections;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,6 +25,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CommentDaoTest {
 
+    private static final String EXISTING_BOOK_TITLE = "Lovers of death";
+    private static final long EXISTING_BOOK_ID = 1;
+    private static final String NEW_BOOK_TEXT = "text of the book with title<<the player who climbed to the top>>";
+    private static final long EXISTING_AUTHOR_ID = 2;
+    private static final String EXISTING_AUTHOR_NAME = "Leach23";
+    private static final long EXISTING_GENRE_ID = 2;
+    private static final String EXISTING_GENRE_NAME = "fantastic";
     private static final long EXISTING_COMMENT_ID = 1;
     private static final String EXISTING_COMMENT_TEXT = "Content of first comment";
     private static final String NEW_COMMENT_TEXT = "Content of new comment";
@@ -49,7 +60,10 @@ public class CommentDaoTest {
     @DisplayName("должен добавить комментрий")
     void shouldInsetComment(){
         long sizeBefore = commentDao.findAll().size();
-        Comment comment = Comment.builder().text(NEW_COMMENT_TEXT).build();
+        Comment comment = Comment.builder().text(NEW_COMMENT_TEXT).book(Book.builder().id(EXISTING_BOOK_ID)
+                .title(EXISTING_BOOK_TITLE).text(NEW_BOOK_TEXT).author(Author.builder()
+                .id(EXISTING_AUTHOR_ID).name(EXISTING_AUTHOR_NAME).build()).genre(Genre.builder()
+                .id(EXISTING_GENRE_ID).name(EXISTING_GENRE_NAME).build()).comments(Collections.emptyList()).build()).build();
         assertAll(
             () -> assertEquals(NEW_COMMENT_TEXT, commentDao.insert(comment).getText()),
             () -> assertEquals(sizeBefore, commentDao.findAll().size() - 1)
