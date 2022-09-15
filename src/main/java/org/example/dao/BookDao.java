@@ -3,10 +3,11 @@ package org.example.dao;
 import org.example.domain.Book;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BookDao {
 
-    Book findByTitle(String title);
+    Optional<Book> findByTitle(String title);
 
     List<Book> findAll();
 
@@ -14,9 +15,4 @@ public interface BookDao {
 
     void deleteByTitle(String title);
 
-    void deleteBooksByAuthorId(long author_id);
-
-    void deleteBooksByGenreId(long genre_id);
-
-    void setBooks(List<Book> books);
 }

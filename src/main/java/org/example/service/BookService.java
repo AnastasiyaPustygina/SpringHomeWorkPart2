@@ -1,8 +1,7 @@
 package org.example.service;
 
-import org.example.domain.Book;
-
 import java.util.List;
+import org.example.domain.Book;
 
 public interface BookService {
 

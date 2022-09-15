@@ -1,8 +1,8 @@
 package org.example.service;
 
+import java.util.List;
 import org.example.domain.Genre;
 
-import java.util.List;
 
 public interface GenreService {
 

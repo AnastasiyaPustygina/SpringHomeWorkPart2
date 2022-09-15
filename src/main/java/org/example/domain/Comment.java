@@ -10,19 +10,23 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "authors")
-public class Author {
+@Table(name = "comments")
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "name", unique = true)
-    private String name;
+    @Column(name = "text")
+    private String text;
+
+    @ManyToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id")
+    private Book book;
 
     @Override
     public String toString() {
-        return "id: " + id + "\n" +
-                "name: " + name;
+        return "id: " + id + "\n" + "text: " + text;
     }
+
 }

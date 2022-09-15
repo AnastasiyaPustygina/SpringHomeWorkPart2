@@ -1,8 +1,7 @@
 package org.example.service;
 
-import org.example.domain.Author;
-
 import java.util.List;
+import org.example.domain.Author;
 
 public interface AuthorService {
 
