@@ -32,11 +32,18 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Override
+    public List<Comment> findByBookTitle(String title) throws BookNotFoundException{
+        bookDao.findByTitle(title).orElseThrow(() -> new BookNotFoundException(
+                "book with title " + title + " was not found"));
+        return dao.findByBookTitle(title);
+    }
+
+    @Override
     @Transactional
     public Comment insert(Comment comment) throws CommentAlreadyExistsException,
             BookNotFoundException{
         if(comment.getId() <= 0){
-            return dao.insert(comment);
+            return dao.save(comment);
         }
         throw new CommentAlreadyExistsException("comment with id " + comment.getId() +
                 " already exists");
@@ -53,7 +60,7 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     @Transactional
-    public void deleteById(long id) {
+    public void deleteById(long id) throws CommentNotFoundException{
         if(dao.findById(id).isEmpty()){
             throw new CommentNotFoundException("comment with id " + id + " was not found");
         }

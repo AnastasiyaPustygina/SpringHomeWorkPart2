@@ -21,6 +21,11 @@ public class CommentShellCommands {
         demoService.printById();
     }
 
+    @ShellMethod(value = "show comments by book title", key = {"scb", "show comment by book title"})
+    public void showByBookTitle(){
+        demoService.printByBookTitle();
+    }
+
     @ShellMethod(value = "update comment text by id", key = {"uc", "update comment text by id"})
     public void updateTextById(){
         demoService.updateTextById();

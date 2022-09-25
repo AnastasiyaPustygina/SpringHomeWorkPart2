@@ -15,13 +15,12 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 
 @DataJpaTest
 @ActiveProfiles("test")
-@Import({GenreDaoImpl.class})
 @DisplayName("Класс GenreDao")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class GenreDaoTest {
 
     private static final String EXISTING_GENRE_NAME = "detective";
-    private static final String NEW_GENRE_NAME = "fantasy";
+    private static final String NEW_GENRE_NAME = "newGenreName";
     private static final long COUNT_OF_GENRES = 3;
 
     @Autowired
@@ -48,7 +47,7 @@ public class GenreDaoTest {
         long countBefore = genreDao.findAll().size();
         Genre genre = Genre.builder().name(NEW_GENRE_NAME).build();
         assertAll(
-                () -> assertEquals(genre.getName(), genreDao.insert(genre).getName()),
+                () -> assertEquals(genre.getName(), genreDao.save(genre).getName()),
                 () -> assertEquals(countBefore + 1, genreDao.findAll().size())
         );
     }

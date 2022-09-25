@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.dao.BookDao;
 import org.example.dao.CommentDao;
+import org.example.domain.Book;
 import org.example.domain.Comment;
 import org.example.exception.CommentAlreadyExistsException;
 import org.example.exception.CommentNotFoundException;
@@ -32,8 +33,8 @@ import static org.mockito.Mockito.verify;
 public class CommentServiceTest {
 
     private static final String EXISTING_COMMENT_TEXT = "Content of first comment";
-    private static final String EXISTING_BOOK_TITLE = "Content of first comment";
     private static final long EXISTING_COMMENT_ID = 1;
+    private static final String EXISTING_BOOK_TITLE = "book_title";
     private static final String EXISTING_COMMENT_TEXT2 = "Content of second comment";
     private static final long EXISTING_COMMENT_ID2 = 2;
     private static final String NEW_COMMENT_TEXT = "Content of new comment";
@@ -41,7 +42,7 @@ public class CommentServiceTest {
 
 
     @Mock
-    private CommentDao dao;
+    private CommentDao commentDao;
     @Mock
     private BookDao bookDao;
 
@@ -51,7 +52,7 @@ public class CommentServiceTest {
 
     @BeforeEach
     void setUp(){
-        commentService = new CommentServiceImpl(dao, bookDao);
+        commentService = new CommentServiceImpl(commentDao, bookDao);
         comments.clear();
         Comment comment1 = Comment.builder().id(EXISTING_COMMENT_ID).text(EXISTING_COMMENT_TEXT).build();
         Comment comment2 = Comment.builder().id(EXISTING_COMMENT_ID2).text(EXISTING_COMMENT_TEXT2).build();
@@ -62,24 +63,32 @@ public class CommentServiceTest {
     @DisplayName("должен найти комментарий по id")
     @Test
     void shouldFindCommentById(){
-        given(dao.findById(EXISTING_COMMENT_ID)).willReturn(Optional.of(comments.get(0)));
+        given(commentDao.findById(EXISTING_COMMENT_ID)).willReturn(Optional.of(comments.get(0)));
         assertEquals(comments.get(0), commentService.findById(EXISTING_COMMENT_ID));
+    }
+
+    @DisplayName("должен найти комментарий по названию книги")
+    @Test
+    void shouldFindCommentByBookTitle(){
+        given(bookDao.findByTitle(EXISTING_BOOK_TITLE)).willReturn(Optional.of(Book.builder().build()));
+        given(commentDao.findByBookTitle(any())).willReturn(comments);
+        assertEquals(comments, commentService.findByBookTitle(EXISTING_BOOK_TITLE));
     }
 
     @DisplayName("должен найти все комментарии")
     @Test
     void shouldFindAllComments(){
-        given(dao.findAll()).willReturn(comments);
+        given(commentDao.findAll()).willReturn(comments);
         assertEquals(comments, commentService.findAll());
     }
 
     @DisplayName("должен удалить комментарий по id")
     @Test
     void shouldDeleteCommentById(){
-        given(dao.findById(EXISTING_COMMENT_ID)).willReturn(Optional.of(comments.get(0)));
+        given(commentDao.findById(EXISTING_COMMENT_ID)).willReturn(Optional.of(comments.get(0)));
         commentService.deleteById(EXISTING_COMMENT_ID);
         assertAll(
-                () -> verify(dao, times(1)).deleteById(EXISTING_COMMENT_ID),
+                () -> verify(commentDao, times(1)).deleteById(EXISTING_COMMENT_ID),
                 () -> assertThrows(CommentNotFoundException.class,
                         () -> commentService.deleteById(NEW_COMMENT_ID))
         );
@@ -89,7 +98,7 @@ public class CommentServiceTest {
     @Test
     void shouldInsertComment(){
         Comment comment = Comment.builder().text(NEW_COMMENT_TEXT).build();
-        given(dao.insert(comment)).willReturn(comment);
+        given(commentDao.save(comment)).willReturn(comment);
         assertAll(
                 () -> assertEquals(commentService.insert(comment).getText(), comment.getText()),
                 () -> assertThrows(CommentAlreadyExistsException.class, () -> commentService.insert(

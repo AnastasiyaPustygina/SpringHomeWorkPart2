@@ -42,7 +42,7 @@ public class BookServiceImpl implements BookService {
         if(bookDao.findByTitle(book.getTitle()).isPresent()) {
             throw new BookAlreadyExistsException("book with title " + book.getTitle() + " already exists");
         }
-        return bookDao.insert(Book.builder().title(book.getTitle())
+        return bookDao.save(Book.builder().title(book.getTitle())
             .text(book.getText()).author(author).genre(genre).build());
     }
 
@@ -57,11 +57,11 @@ public class BookServiceImpl implements BookService {
 
     private Author getOrInsertAuthor(Author author) {
         Optional<Author> optAuthor = authorDao.findByName(author.getName());
-        return optAuthor.isEmpty() ? authorDao.insert(author) : optAuthor.get();
+        return optAuthor.isEmpty() ? authorDao.save(author) : optAuthor.get();
 
     }
     private Genre getOrInsertGenre(Genre genre){
         Optional<Genre> optGenre = genreDao.findByName(genre.getName());
-        return optGenre.isEmpty() ? genreDao.insert(genre) : optGenre.get();
+        return optGenre.isEmpty() ? genreDao.save(genre) : optGenre.get();
     }
 }

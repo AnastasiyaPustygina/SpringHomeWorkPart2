@@ -30,11 +30,11 @@ public class GenreServiceImpl implements GenreService{
     @Override
     @Transactional
     public Genre insert(Genre genre) {
-        if (genre.getId() <= 0){
-            return dao.insert(genre);
+        if (dao.findByName(genre.getName()).isPresent()){
+            throw new GenreAlreadyExistsException("genre with name " + genre.getName() +
+                    " already exists");
         }
-        throw new GenreAlreadyExistsException("genre with name " + genre.getName() +
-                " already exists");
+        return dao.save(genre);
     }
 
     @Override

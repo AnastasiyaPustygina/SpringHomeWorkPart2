@@ -9,6 +9,7 @@ import org.example.exception.AuthorAlreadyExistsException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,11 +31,11 @@ public class AuthorServiceImpl implements AuthorService{
     @Override
     @Transactional
     public Author insert(Author author) throws AuthorAlreadyExistsException {
-        if(author.getId() <= 0) {
-            return dao.insert(author);
-        }
-        throw new AuthorAlreadyExistsException("author with name " + author.getName() +
+        if(dao.findByName(author.getName()).isPresent()){
+            throw new AuthorAlreadyExistsException("author with name " + author.getName() +
                     " already exists");
+        }
+        return dao.save(author);
     }
 
     @Override

@@ -17,7 +17,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 
 @DataJpaTest
 @ActiveProfiles("test")
-@Import({AuthorDaoImpl.class})
 @DisplayName("Класс AuthorDao")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class AuthorDaoTest {
@@ -51,7 +50,7 @@ public class AuthorDaoTest {
         long countBefore = authorDao.findAll().size();
         Author author = Author.builder().name(NEW_AUTHOR_NAME).build();
         assertAll(
-                () -> assertEquals(NEW_AUTHOR_NAME, authorDao.insert(author).getName()),
+                () -> assertEquals(NEW_AUTHOR_NAME, authorDao.save(author).getName()),
                 () -> assertEquals(countBefore + 1, authorDao.findAll().size())
         );
     }

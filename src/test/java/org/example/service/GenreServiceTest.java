@@ -79,11 +79,14 @@ public class GenreServiceTest {
     @Test
     void shouldInsertGenre(){
         Genre genre = Genre.builder().name(NEW_GENRE_NAME).build();
-        given(dao.insert(genre)).willReturn(genre);
+        given(dao.save(any())).willReturn(genre);
+        given(dao.findByName(EXISTING_GENRE_NAME)).willReturn(Optional.of(genres.get(0)));
+        given(dao.findByName(NEW_GENRE_NAME)).willReturn(Optional.empty());
         assertAll(
                 () -> assertEquals(genreService.insert(genre).getName(), genre.getName()),
-                () -> assertThrows(GenreAlreadyExistsException.class, () -> genreService.insert(
-                        genres.get(0)))
+                () -> assertThrows(GenreAlreadyExistsException.class, () -> {
+                    genreService.insert(Genre.builder().name(EXISTING_GENRE_NAME).build());
+                })
         );
     }
 }
