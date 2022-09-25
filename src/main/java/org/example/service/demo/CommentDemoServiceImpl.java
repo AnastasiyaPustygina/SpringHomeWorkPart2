@@ -1,5 +1,6 @@
 package org.example.service.demo;
 
+import java.util.List;
 import java.util.Scanner;
 import org.example.domain.Comment;
 import lombok.RequiredArgsConstructor;
@@ -55,5 +56,13 @@ public class CommentDemoServiceImpl implements CommentDemoService{
     public void deleteById() {
         System.out.println(ENTER_COMMENT_ID);
         commentService.deleteById(scanner.nextLong());
+    }
+
+    @Override
+    public void printByBookTitle() {
+        System.out.println(ENTER_BOOK_TITLE);
+        List<Comment> comments = commentService.findByBookTitle(scanner.nextLine());
+        if(comments.isEmpty()) System.out.println("This book has no comments");
+        comments.forEach(System.out::println);
     }
 }

@@ -1,17 +1,19 @@
 package org.example.dao;
 
-import org.example.domain.Book;
-
 import java.util.List;
 import java.util.Optional;
+import org.example.domain.Book;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface BookDao {
+
+public interface BookDao extends JpaRepository<Book, Long> {
 
     Optional<Book> findByTitle(String title);
 
+    @Override
+    @EntityGraph(attributePaths = {"author", "genre", "comments"})
     List<Book> findAll();
-
-    Book insert(Book book);
 
     void deleteByTitle(String title);
 

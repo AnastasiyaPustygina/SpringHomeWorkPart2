@@ -104,7 +104,7 @@ public class BookServiceTest {
         Book book = Book.builder().id(NEW_BOOK_ID).title(NEW_BOOK_TITLE).text(NEW_BOOK_TEXT)
                 .author(Author.builder().name(NEW_AUTHOR_NAME).build())
                 .genre(Genre.builder().name(NEW_GENRE_NAME).build()).build();
-        given(dao.insert(any())).willReturn(book);
+        given(dao.save(any())).willReturn(book);
         given(dao.findByTitle(EXISTING_BOOK_TITLE)).willReturn(Optional.of(books.get(0)));
         given(dao.findByTitle(NEW_BOOK_TITLE)).willReturn(Optional.empty());
         given(authorDao.findByName(NEW_AUTHOR_NAME)).willReturn(Optional.empty());

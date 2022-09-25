@@ -15,8 +15,6 @@ import java.util.stream.IntStream;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "books")
-@NamedEntityGraph(name = "books-entity-graph", attributeNodes = {@NamedAttributeNode("author"),
-@NamedAttributeNode("genre")})
 public class Book {
 
     @Id
@@ -33,11 +31,10 @@ public class Book {
     @JoinColumn(name = "author_id")
     private Author author;
 
-    @ManyToOne(targetEntity = Genre.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = Genre.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "genre_id")
     private Genre genre;
 
-    @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = Comment.class, cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "book")
     private List<Comment> comments;
 

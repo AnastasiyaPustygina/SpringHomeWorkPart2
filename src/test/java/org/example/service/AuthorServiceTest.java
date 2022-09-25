@@ -81,7 +81,10 @@ public class AuthorServiceTest {
     @Test
     void shouldInsertAuthor(){
         Author author = Author.builder().name(NEW_AUTHOR_NAME).build();
-        given(dao.insert(author)).willReturn(author);
+        given(dao.save(author)).willReturn(author);
+        given(dao.findByName(author.getName())).willReturn(Optional.empty());
+        given(dao.findByName(EXISTING_AUTHOR_NAME)).willReturn(Optional.of(authors.get(0)));
+
         assertAll(
                 () -> assertEquals(authorService.insert(author).getName(), author.getName()),
                 () -> assertThrows(AuthorAlreadyExistsException.class, () -> authorService.insert(

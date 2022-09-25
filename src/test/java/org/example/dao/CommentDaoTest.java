@@ -10,30 +10,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
-@Import(CommentDaoImpl.class)
 @DisplayName("Класс CommentDao")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CommentDaoTest {
 
     private static final String EXISTING_BOOK_TITLE = "Lovers of death";
     private static final long EXISTING_BOOK_ID = 1;
-    private static final String NEW_BOOK_TEXT = "text of the book with title<<the player who climbed to the top>>";
-    private static final long EXISTING_AUTHOR_ID = 2;
-    private static final String EXISTING_AUTHOR_NAME = "Leach23";
-    private static final long EXISTING_GENRE_ID = 2;
-    private static final String EXISTING_GENRE_NAME = "fantastic";
+    private static final String EXISTING_BOOK_TEXT = "text of the book with name <<Lovers of death>>";
+    private static final long EXISTING_AUTHOR_ID = 1;
+    private static final String EXISTING_AUTHOR_NAME = "Boris Akunin";
+    private static final long EXISTING_GENRE_ID = 1;
+    private static final String EXISTING_GENRE_NAME = "detective";
     private static final long EXISTING_COMMENT_ID = 1;
     private static final String EXISTING_COMMENT_TEXT = "Content of first comment";
+    private static final long SECOND_COMMENT_ID = 2;
+    private static final String SECOND_COMMENT_TEXT = "Content of second comment";
     private static final String NEW_COMMENT_TEXT = "Content of new comment";
     private static final long COUNT_OF_COMMENT = 3;
 
@@ -61,11 +62,11 @@ public class CommentDaoTest {
     void shouldInsetComment(){
         long sizeBefore = commentDao.findAll().size();
         Comment comment = Comment.builder().text(NEW_COMMENT_TEXT).book(Book.builder().id(EXISTING_BOOK_ID)
-                .title(EXISTING_BOOK_TITLE).text(NEW_BOOK_TEXT).author(Author.builder()
+                .title(EXISTING_BOOK_TITLE).text(EXISTING_BOOK_TEXT).author(Author.builder()
                 .id(EXISTING_AUTHOR_ID).name(EXISTING_AUTHOR_NAME).build()).genre(Genre.builder()
                 .id(EXISTING_GENRE_ID).name(EXISTING_GENRE_NAME).build()).comments(Collections.emptyList()).build()).build();
         assertAll(
-            () -> assertEquals(NEW_COMMENT_TEXT, commentDao.insert(comment).getText()),
+            () -> assertEquals(NEW_COMMENT_TEXT, commentDao.save(comment).getText()),
             () -> assertEquals(sizeBefore, commentDao.findAll().size() - 1)
         );
     }
@@ -82,5 +83,18 @@ public class CommentDaoTest {
 
     }
 
-
+    @Test
+    @DisplayName("должен найти комменарии по названию книги")
+    void shouldFindCommentsByBookTitle(){
+        Comment comment = Comment.builder().id(EXISTING_COMMENT_ID).text(EXISTING_COMMENT_TEXT).book(Book.builder().id(EXISTING_BOOK_ID)
+                .title(EXISTING_BOOK_TITLE).text(EXISTING_BOOK_TEXT).author(Author.builder()
+                        .id(EXISTING_AUTHOR_ID).name(EXISTING_AUTHOR_NAME).build()).genre(Genre.builder()
+                        .id(EXISTING_GENRE_ID).name(EXISTING_GENRE_NAME).build()).comments(Collections.emptyList()).build()).build();
+        Comment comment2 = Comment.builder().id(SECOND_COMMENT_ID).text(SECOND_COMMENT_TEXT).book(Book.builder().id(EXISTING_BOOK_ID)
+                .title(EXISTING_BOOK_TITLE).text(EXISTING_BOOK_TEXT).author(Author.builder()
+                        .id(EXISTING_AUTHOR_ID).name(EXISTING_AUTHOR_NAME).build()).genre(Genre.builder()
+                        .id(EXISTING_GENRE_ID).name(EXISTING_GENRE_NAME).build()).comments(Collections.emptyList()).build()).build();
+        assertThat(List.of(comment, comment2)).usingRecursiveComparison().comparingOnlyFields("id")
+                .isEqualTo(commentDao.findByBookTitle(EXISTING_BOOK_TITLE));
+    }
 }

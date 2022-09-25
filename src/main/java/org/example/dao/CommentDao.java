@@ -1,20 +1,17 @@
 package org.example.dao;
 
-import org.example.domain.Comment;
-
 import java.util.List;
-import java.util.Optional;
+import org.example.domain.Comment;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.Modifying;
 
-public interface CommentDao {
+public interface CommentDao extends JpaRepository<Comment, Long> {
 
-    Optional<Comment> findById(long id);
+    @Modifying
+    @Query(value = "update Comment c set c.text = :text where c.id = :id")
+    void updateTextById(@Param("id") long id, @Param("text") String text);
 
-    List<Comment> findAll();
-
-    Comment insert(Comment comment);
-
-    void updateTextById(long id, String text);
-
-    void deleteById(long id);
-
+    List<Comment> findByBookTitle(String title);
 }
