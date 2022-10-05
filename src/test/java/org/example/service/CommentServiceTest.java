@@ -6,13 +6,13 @@ import org.example.domain.Book;
 import org.example.domain.Comment;
 import org.example.exception.CommentAlreadyExistsException;
 import org.example.exception.CommentNotFoundException;
+import org.example.rest.dto.CommentDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
@@ -23,18 +23,17 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @DisplayName("Класс CommentService")
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
 @ActiveProfiles("test")
 public class CommentServiceTest {
 
     private static final String EXISTING_COMMENT_TEXT = "Content of first comment";
     private static final long EXISTING_COMMENT_ID = 1;
-    private static final String EXISTING_BOOK_TITLE = "book_title";
+    private static final long EXISTING_BOOK_ID = 1;
+    private static final String EXISTING_BOOK_TITLE = "Lovers of death";
     private static final String EXISTING_COMMENT_TEXT2 = "Content of second comment";
     private static final long EXISTING_COMMENT_ID2 = 2;
     private static final String NEW_COMMENT_TEXT = "Content of new comment";
@@ -52,7 +51,7 @@ public class CommentServiceTest {
 
     @BeforeEach
     void setUp(){
-        commentService = new CommentServiceImpl(commentDao, bookDao);
+        commentService = new CommentServiceImpl(commentDao,bookDao);
         comments.clear();
         Comment comment1 = Comment.builder().id(EXISTING_COMMENT_ID).text(EXISTING_COMMENT_TEXT).build();
         Comment comment2 = Comment.builder().id(EXISTING_COMMENT_ID2).text(EXISTING_COMMENT_TEXT2).build();
@@ -97,12 +96,14 @@ public class CommentServiceTest {
     @DisplayName("должен добавлить коментарий")
     @Test
     void shouldInsertComment(){
-        Comment comment = Comment.builder().text(NEW_COMMENT_TEXT).build();
-        given(commentDao.save(comment)).willReturn(comment);
+        Comment comment = Comment.builder().text(NEW_COMMENT_TEXT).book(Book.builder().id(EXISTING_BOOK_ID).
+                title(EXISTING_BOOK_TITLE).build()).build();
+        given(commentDao.save(any())).willReturn(comment);
+        given(bookDao.findByTitle(any())).willReturn(Optional.of(comment.getBook()));
         assertAll(
-                () -> assertEquals(commentService.insert(comment).getText(), comment.getText()),
+                () -> assertEquals(commentService.insert(CommentDto.toDto(comment), EXISTING_BOOK_TITLE).getText(), comment.getText()),
                 () -> assertThrows(CommentAlreadyExistsException.class, () -> commentService.insert(
-                        comments.get(0)))
+                        CommentDto.toDto(comments.get(0)), EXISTING_BOOK_TITLE))
         );
     }
 }

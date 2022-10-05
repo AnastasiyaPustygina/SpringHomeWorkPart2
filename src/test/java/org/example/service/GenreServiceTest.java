@@ -22,7 +22,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @DisplayName("Класс GenreService")
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
 @ActiveProfiles("test")
 public class GenreServiceTest {
 

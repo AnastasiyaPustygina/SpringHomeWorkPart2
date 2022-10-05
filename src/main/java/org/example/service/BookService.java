@@ -4,7 +4,6 @@ import java.util.List;
 import org.example.domain.Book;
 
 public interface BookService {
-
     Book findByTitle(String title);
 
     List<Book> findAll();

@@ -13,5 +13,4 @@ public interface GenreService {
     Genre insert(Genre genre);
 
     void deleteByName(String name);
-
 }

@@ -3,11 +3,11 @@ package org.example.service;
 import lombok.RequiredArgsConstructor;
 import org.example.dao.BookDao;
 import org.example.dao.CommentDao;
-import org.example.domain.Book;
 import org.example.domain.Comment;
 import org.example.exception.BookNotFoundException;
 import org.example.exception.CommentAlreadyExistsException;
 import org.example.exception.CommentNotFoundException;
+import org.example.rest.dto.CommentDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,16 +33,17 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     public List<Comment> findByBookTitle(String title) throws BookNotFoundException{
-        bookDao.findByTitle(title).orElseThrow(() -> new BookNotFoundException(
-                "book with title " + title + " was not found"));
+        bookDao.findByTitle(title);
         return dao.findByBookTitle(title);
     }
 
     @Override
     @Transactional
-    public Comment insert(Comment comment) throws CommentAlreadyExistsException,
+    public Comment insert(CommentDto commentDto, String bookTitle) throws CommentAlreadyExistsException,
             BookNotFoundException{
-        if(comment.getId() <= 0){
+        Comment comment = Comment.builder().id(commentDto.getId()).text(commentDto.getText()).book(
+                bookDao.findByTitle(bookTitle).orElseThrow(() -> new BookNotFoundException("book with title " + bookTitle + " was not found"))).build();
+        if(commentDto.getId() <= 0){
             return dao.save(comment);
         }
         throw new CommentAlreadyExistsException("comment with id " + comment.getId() +
