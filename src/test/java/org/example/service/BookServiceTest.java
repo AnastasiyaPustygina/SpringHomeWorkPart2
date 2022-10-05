@@ -31,7 +31,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
 @DisplayName("Класс BookService")
 @ActiveProfiles("test")
 public class BookServiceTest {

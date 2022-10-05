@@ -1,9 +1,9 @@
 package org.example.service;
 
 import org.example.domain.Comment;
+import org.example.rest.dto.CommentDto;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CommentService {
 
@@ -13,7 +13,7 @@ public interface CommentService {
 
     List<Comment> findByBookTitle(String title);
 
-    Comment insert(Comment comment);
+    Comment insert(CommentDto commentDto, String bookTitle);
 
     void updateTextById(long id, String text);
 

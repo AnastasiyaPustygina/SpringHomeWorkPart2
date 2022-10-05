@@ -12,5 +12,4 @@ public interface AuthorService {
     Author insert(Author author);
 
     void deleteByName(String name);
-
 }
