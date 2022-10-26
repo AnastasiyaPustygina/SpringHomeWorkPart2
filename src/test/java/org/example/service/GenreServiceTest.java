@@ -58,7 +58,6 @@ public class GenreServiceTest {
     @Test
     void shouldFindAllGenres(){
         given(dao.findAll()).willReturn(genres);
-        System.out.println(genreService.findAll());
         assertEquals(genres, genreService.findAll());
     }
 

@@ -86,7 +86,7 @@ public class BookControllerTest {
                 .andExpect(status().isOk()).andExpect(content().json(mapper.writeValueAsString(bookDto)));
     }
 
-    @WithMockUser(username = "author", authorities = {"ROLE_AUTHOR"})
+    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
     @Test
     @DisplayName("должен добавить книгу")
     void shouldInsertBook() throws Exception {
