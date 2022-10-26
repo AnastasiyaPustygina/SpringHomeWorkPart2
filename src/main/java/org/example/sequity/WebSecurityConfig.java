@@ -18,6 +18,6 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf().disable().cors().disable().build();
+        return http.csrf().disable().build();
     }
 }
