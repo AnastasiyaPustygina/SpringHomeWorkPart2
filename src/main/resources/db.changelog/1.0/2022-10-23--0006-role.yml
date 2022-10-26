@@ -1,25 +1,25 @@
 databaseChangeLog:
   - changeSet:
-      id: 2022-09-06--0001-author
+      id: 2022-10-23--0006-role
       author: apustygina
       preConditions:
         not:
           tableExists:
-            tableName: authors
+            tableName: roles
       createTable:
-        tableName: authors
+        tableName: roles
         columns:
           - column:
-
               name: id
               type: bigint
               autoIncrement: true
               constraints:
                 nullable: false
                 primaryKey: true
-                primaryKeyName: pk_author
+                primaryKeyName: pk_role
           - column:
               name: name
-              type: varchar(200)
+              type: varchar(100)
               constraints:
                 nullable: false
+                unique: true

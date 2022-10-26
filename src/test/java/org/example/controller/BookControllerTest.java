@@ -7,7 +7,6 @@ import org.example.domain.Comment;
 import org.example.domain.Genre;
 import org.example.exception.BookNotFoundException;
 import org.example.rest.dto.BookDto;
-import org.example.rest.dto.CommentDto;
 import org.example.service.BookService;
 import org.example.service.CommentService;
 import org.junit.jupiter.api.DisplayName;
@@ -17,10 +16,10 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -63,6 +62,7 @@ public class BookControllerTest {
     @Autowired
     private BookService bookService;
 
+    @WithMockUser(username = "reader", authorities = {"ROLE_READER"})
     @Test
     @DisplayName("должен найти все книги")
     public void shouldFindAllBooks() throws Exception {
@@ -70,6 +70,7 @@ public class BookControllerTest {
                 .andExpect(jsonPath("$", hasSize(COUNT_OF_BOOK)));
     }
 
+    @WithMockUser(username = "reader", authorities = {"ROLE_READER"})
     @Test
     @DisplayName("должен найти книгу по названию")
     void shouldFindBookByTitle() throws Exception {
@@ -85,6 +86,7 @@ public class BookControllerTest {
                 .andExpect(status().isOk()).andExpect(content().json(mapper.writeValueAsString(bookDto)));
     }
 
+    @WithMockUser(username = "author", authorities = {"ROLE_AUTHOR"})
     @Test
     @DisplayName("должен добавить книгу")
     void shouldInsertBook() throws Exception {
@@ -99,6 +101,7 @@ public class BookControllerTest {
                 .andExpect(content().json(mapper.writeValueAsString(resultingBookDto)));
     }
 
+    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
     @Test
     @DisplayName("должен удалить книгу по имени")
     void shouldDeleteBookByTitle() throws Exception{

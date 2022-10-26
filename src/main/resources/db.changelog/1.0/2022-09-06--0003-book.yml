@@ -28,7 +28,7 @@ databaseChangeLog:
           type: bigint
           constraints:
             nullable: false
-            foreignKeyName: fk_book_auhtor
+            foreignKeyName: fk_book_author
             references: authors(id)
             deleteCascade: true
       - column:
