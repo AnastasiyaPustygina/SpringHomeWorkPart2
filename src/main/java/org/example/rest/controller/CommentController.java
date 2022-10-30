@@ -2,11 +2,8 @@ package org.example.rest.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.domain.Comment;
-import org.example.exception.BookAlreadyExistsException;
-import org.example.exception.BookNotFoundException;
 import org.example.exception.CommentAlreadyExistsException;
 import org.example.exception.CommentNotFoundException;
-import org.example.rest.dto.BookDto;
 import org.example.rest.dto.CommentDto;
 import org.example.service.CommentService;
 import org.springframework.http.ResponseEntity;
