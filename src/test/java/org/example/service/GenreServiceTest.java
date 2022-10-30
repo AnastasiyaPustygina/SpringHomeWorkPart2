@@ -18,7 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.example.exception.GenreNotFoundException;
 import org.springframework.test.context.ActiveProfiles;
 import org.example.exception.GenreAlreadyExistsException;
-import org.springframework.boot.test.context.SpringBootTest;
 
 @DisplayName("Класс GenreService")
 @ExtendWith(MockitoExtension.class)
@@ -59,7 +58,6 @@ public class GenreServiceTest {
     @Test
     void shouldFindAllGenres(){
         given(dao.findAll()).willReturn(genres);
-        System.out.println(genreService.findAll());
         assertEquals(genres, genreService.findAll());
     }
 

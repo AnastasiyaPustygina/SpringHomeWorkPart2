@@ -2,8 +2,12 @@ package org.example.rest.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.domain.Genre;
+import org.example.exception.GenreAlreadyExistsException;
+import org.example.exception.GenreNotFoundException;
 import org.example.rest.dto.GenreDto;
 import org.example.service.GenreService;
+import org.example.sequity.JpaUserDetailsService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GenreController{
     private final GenreService genreService;
+    private final JpaUserDetailsService service;
 
     @GetMapping("/genre/")
     public List<GenreDto> getAllGenres(){
@@ -32,6 +37,11 @@ public class GenreController{
     @DeleteMapping("/genre/{name}")
     public void deleteGenre(@PathVariable String name){
         genreService.deleteByName(name);
+    }
+
+    @ExceptionHandler({GenreNotFoundException.class, GenreAlreadyExistsException.class})
+    public ResponseEntity<String> handlerGenreException(Exception e){
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 
 }

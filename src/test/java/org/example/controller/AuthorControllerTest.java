@@ -1,6 +1,5 @@
 package org.example.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.domain.Author;
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,11 +11,11 @@ import org.example.rest.dto.AuthorDto;
 import org.example.service.AuthorService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -49,6 +48,7 @@ public class AuthorControllerTest {
     @Autowired
     private AuthorService authorService;
 
+    @WithMockUser(username = "reader", authorities = {"ROLE_READER"})
     @Test
     @DisplayName("должен найти всех авторов")
     void shouldFindAllAuthors() throws Exception {
@@ -60,6 +60,7 @@ public class AuthorControllerTest {
                 .andExpect(status().isOk()).andExpect(content().json(mapper.writeValueAsString(authors)));
     }
 
+    @WithMockUser(username = "reader", authorities = {"ROLE_READER"})
     @Test
     @DisplayName("должен найти автора по имени")
     void shouldFindAuthorByName() throws Exception {
@@ -68,6 +69,7 @@ public class AuthorControllerTest {
                 .andExpect(status().isOk()).andExpect(content().json(mapper.writeValueAsString(AuthorDto.toDto(author))));
     }
 
+    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
     @Test
     @DisplayName("должен добавить автора")
     void shouldInsertAuthor() throws Exception {
@@ -78,6 +80,7 @@ public class AuthorControllerTest {
                         .name(author.getName()).build()))));
     }
 
+    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
     @Test
     @DisplayName("должен удалять автора по имени")
     void shouldDeleteAuthorByName() throws Exception {

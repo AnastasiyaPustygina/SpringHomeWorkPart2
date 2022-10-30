@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -47,6 +48,7 @@ public class GenreControllerTest {
     @Autowired
     private GenreService genreService;
 
+    @WithMockUser(username = "reader", authorities = {"ROLE_READER"})
     @Test
     @DisplayName("должен найти все жанры")
     void shouldFindAllGenres() throws Exception {
@@ -58,6 +60,7 @@ public class GenreControllerTest {
                 .andExpect(status().isOk()).andExpect(content().json(mapper.writeValueAsString(genres)));
     }
 
+    @WithMockUser(username = "reader", authorities = {"ROLE_READER"})
     @Test
     @DisplayName("должен найти жанр по имени")
     void shouldFindGenreByName() throws Exception {
@@ -66,6 +69,7 @@ public class GenreControllerTest {
                 .andExpect(status().isOk()).andExpect(content().json(mapper.writeValueAsString(GenreDto.toDto(genre))));
     }
 
+    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
     @Test
     @DisplayName("должен добавить жанр")
     void shouldInsertGenre() throws Exception {
@@ -76,6 +80,7 @@ public class GenreControllerTest {
                         id(NEW_GENRE_ID).name(NEW_GENRE_NAME).build()))));
     }
 
+    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
     @Test
     @DisplayName("должен удалять жанр по имени")
     void shouldDeleteGenreByName() throws Exception {

@@ -2,8 +2,11 @@ package org.example.rest.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.domain.Author;
+import org.example.exception.AuthorAlreadyExistsException;
+import org.example.exception.AuthorNotFoundException;
 import org.example.rest.dto.AuthorDto;
 import org.example.service.AuthorService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,4 +37,8 @@ public class AuthorController{
         authorService.deleteByName(name);
     }
 
+    @ExceptionHandler({AuthorNotFoundException.class, AuthorAlreadyExistsException.class})
+    public ResponseEntity<String> handlerAuthorException(Exception e){
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
 }

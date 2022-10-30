@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -52,6 +53,7 @@ public class CommentControllerTest {
     @Autowired
     private CommentService commentService;
 
+    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
     @Test
     @DisplayName("должен найти все комментарии")
     void shouldFindAllComments() throws Exception {
@@ -59,6 +61,7 @@ public class CommentControllerTest {
                 .andExpect(jsonPath("$", hasSize(COUNT_OF_COMMENTS)));
     }
 
+    @WithMockUser(username = "reader", authorities = {"ROLE_READER"})
     @Test
     @DisplayName("должен найти комментарий по id")
     void shouldFindCommentById() throws Exception {
@@ -70,13 +73,15 @@ public class CommentControllerTest {
                 .andExpect(content().json(mapper.writeValueAsString(CommentDto.toDto(comment))));
     }
 
+    @WithMockUser(username = "reader", authorities = {"ROLE_READER"})
     @Test
-    @DisplayName("должен найти все комментарии")
+    @DisplayName("должен найти комментарии по названию книги")
     void shouldFindCommentsByBookTitle() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/book/" + EXISTING_BOOK_TITLE + "/comments"))
+        mvc.perform(MockMvcRequestBuilders.get("/comment/book/" + EXISTING_BOOK_TITLE))
                 .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(COUNT_OF_FIRST_BOOK_COMMENTS)));
     }
 
+    @WithMockUser(username = "reader", authorities = {"ROLE_READER"})
     @Test
     @DisplayName("должен добавить комментарий")
     void shouldInsertComment() throws Exception {
@@ -89,6 +94,7 @@ public class CommentControllerTest {
                 .param("bookTitle", EXISTING_BOOK_TITLE)).andExpect(status().isOk());
     }
 
+    @WithMockUser(username = "reader", authorities = {"ROLE_READER"})
     @Test
     @DisplayName("должен изменить текст комментария по id")
     void shouldUpdateCommentTextById() throws Exception {

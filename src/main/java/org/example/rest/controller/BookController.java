@@ -2,12 +2,13 @@ package org.example.rest.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.domain.Book;
+import org.example.exception.BookAlreadyExistsException;
+import org.example.exception.BookNotFoundException;
 import org.example.rest.dto.BookDto;
-import org.example.rest.dto.CommentDto;
 import org.example.service.BookService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,5 +39,10 @@ public class BookController {
     @DeleteMapping("/book/{title}")
     public void deleteBookByTitle(@PathVariable String title){
         bookService.deleteByTitle(title);
+    }
+
+    @ExceptionHandler({BookNotFoundException.class, BookAlreadyExistsException.class})
+    public ResponseEntity<String> handlerBookException(Exception e){
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }

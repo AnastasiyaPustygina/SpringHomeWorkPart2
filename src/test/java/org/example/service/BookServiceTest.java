@@ -1,23 +1,19 @@
 package org.example.service;
 
-import org.checkerframework.checker.nullness.Opt;
 import org.example.dao.AuthorDao;
 import org.example.dao.BookDao;
 import org.example.dao.GenreDao;
 import org.example.domain.Author;
 import org.example.domain.Book;
 import org.example.domain.Genre;
-import org.example.exception.AuthorAlreadyExistsException;
 import org.example.exception.BookAlreadyExistsException;
 import org.example.exception.BookNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;

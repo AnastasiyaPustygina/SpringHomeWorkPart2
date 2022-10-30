@@ -9,7 +9,6 @@ import org.example.exception.AuthorAlreadyExistsException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

@@ -2,9 +2,14 @@ package org.example.rest.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.domain.Comment;
+import org.example.exception.BookAlreadyExistsException;
+import org.example.exception.BookNotFoundException;
+import org.example.exception.CommentAlreadyExistsException;
+import org.example.exception.CommentNotFoundException;
 import org.example.rest.dto.BookDto;
 import org.example.rest.dto.CommentDto;
 import org.example.service.CommentService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,7 +30,7 @@ public class CommentController {
         return CommentDto.toDto(commentService.findById(id));
     }
 
-    @GetMapping("/book/{bookTitle}/comments")
+    @GetMapping("/comment/book/{bookTitle}")
     public List<CommentDto> findByBookTitle(@PathVariable String bookTitle){
         return commentService.findByBookTitle(bookTitle).stream().map(CommentDto::toDto).toList();
     }
@@ -46,4 +51,8 @@ public class CommentController {
         commentService.deleteById(id);
     }
 
+    @ExceptionHandler({CommentNotFoundException.class, CommentAlreadyExistsException.class})
+    public ResponseEntity<String> handlerCommentException(Exception e){
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
 }
