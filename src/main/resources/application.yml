@@ -1,6 +1,18 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: logfile, health, metrics, shutdown
+  endpoint:
+    health:
+      show-details: always
+    shutdown: enabled
 server:
   port: 8080
 spring:
+  data:
+    rest:
+      basePath: /datarest
   liquibase:
     enabled: true
     change-log: classpath:db.changelog/db.changelog-master.yml
