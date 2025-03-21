@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2022-10-23--0007-user-role-data
+      author: apustygina
+      runOnChanges: true
+      loadData:
+        file: csv/2022-10-23--0007-user-role-data.csv
+        relativeToChangelogFile: true
+        separator: ;
+        quotChar: '"'
+        encoding: UTF-8
+        tableName: user_role

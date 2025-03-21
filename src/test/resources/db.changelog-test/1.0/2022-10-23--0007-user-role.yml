@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2022-10-23--0007-user-role
+      author: apustygina
+      preConditions:
+        not:
+          tableExists:
+            tableName: user_role
+      createTable:
+        tableName: user_role
+        columns:
+          - column:
+              name: user_id
+              type: bigint
+              constraints:
+                nullable: false
+                primaryKey: true
+                primaryKeyName: pk_user_role
+                foreignKeyName: fk_user_role_user
+                references: users(id)
+          - column:
+              name: role_id
+              type: bigint
+              constraints:
+                nullable: false
+                primaryKey: true
+                primaryKeyName: pk_role_user
+                foreignKeyName: fk_role_user_role
+                references: roles(id)

@@ -1,0 +1,13 @@
+databaseChangeLog:
+- changeSet:
+    id: 2022-09-06--0001-author-data
+    author: apustygina
+    runOnChange: true
+    loadData:
+      primaryKey: id
+      file: csv/2022-09-06--0001-author-data.csv
+      relativeToChangelogFile: true
+      separator: ;
+      quotChar: '"'
+      encoding: UTF-8
+      tableName: authors

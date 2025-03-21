@@ -29,6 +29,11 @@ public class BookController {
         Book book = bookService.findByTitle(title);
         return BookDto.toDto(book);
     }
+    @GetMapping("/book/id/{id}")
+    public BookDto findBookById(@PathVariable long id){
+        Book book = bookService.findById(id);
+        return BookDto.toDto(book);
+    }
 
     @PostMapping("/book")
     public BookDto insertBook(@RequestBody BookDto bookDto){

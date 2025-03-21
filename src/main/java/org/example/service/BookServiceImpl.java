@@ -31,6 +31,12 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public Book findById(long id) {
+        return bookDao.findById(id).orElseThrow(
+                () -> new BookNotFoundException("book with id " + id + " was not found"));
+    }
+
+    @Override
     public List<Book> findAll() {
         return bookDao.findAll();
     }
@@ -40,17 +46,17 @@ public class BookServiceImpl implements BookService {
     public Book insert(Book book) {
         Author author = getOrInsertAuthor(book.getAuthor());
         Genre genre = getOrInsertGenre(book.getGenre());
-        if(bookDao.findByTitle(book.getTitle()).isPresent()) {
+        if (bookDao.findByTitle(book.getTitle()).isPresent()) {
             throw new BookAlreadyExistsException("book with title " + book.getTitle() + " already exists");
         }
         return bookDao.save(Book.builder().title(book.getTitle())
-            .text(book.getText()).author(author).genre(genre).build());
+                .text(book.getText()).author(author).genre(genre).build());
     }
 
     @Override
     @Transactional
     public void deleteByTitle(String title) {
-        if(bookDao.findByTitle(title).isEmpty()){
+        if (bookDao.findByTitle(title).isEmpty()) {
             throw new BookNotFoundException("book with title " + title + " was not found");
         }
         bookDao.deleteByTitle(title);
@@ -61,7 +67,8 @@ public class BookServiceImpl implements BookService {
         return optAuthor.isEmpty() ? authorDao.save(author) : optAuthor.get();
 
     }
-    private Genre getOrInsertGenre(Genre genre){
+
+    private Genre getOrInsertGenre(Genre genre) {
         Optional<Genre> optGenre = genreDao.findByName(genre.getName());
         return optGenre.isEmpty() ? genreDao.save(genre) : optGenre.get();
     }

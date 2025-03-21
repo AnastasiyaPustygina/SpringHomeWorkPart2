@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2022-10-23--0006-role-data
+      author: apustygina
+      runOnChange: true
+      loadData:
+        primaryKey: id
+        file: csv/2022-10-23--0006-role-data.csv
+        relativeToChangelogFile: true
+        separator: ;
+        quotChar: '"'
+        encoding: UTF-8
+        tableName: roles

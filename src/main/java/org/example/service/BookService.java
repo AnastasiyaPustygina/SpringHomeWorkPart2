@@ -5,6 +5,7 @@ import org.example.domain.Book;
 
 public interface BookService {
     Book findByTitle(String title);
+    Book findById(long id);
 
     List<Book> findAll();
 

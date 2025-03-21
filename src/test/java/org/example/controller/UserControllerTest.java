@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -29,9 +30,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayName("Класс UserController")
+@ActiveProfiles("test")
 public class UserControllerTest {
     private static final int COUNT_OF_FIRST_ROLE_USERS = 1;
-    private static final String EXISTING_ROLE_NAME = "reader";
+    private static final String EXISTING_ROLE_NAME = "READER";
     private static final String EXISTING_USER_LOGIN = "log";
     private static final String NEW_USER_LOGIN = "newLog";
     private static final String NEW_USER_PASSWORD= "newPass";
